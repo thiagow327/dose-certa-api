@@ -1,5 +1,5 @@
 from database import db
-from datetime import datetime
+from datetime import datetime, timezone
 
 class Remedio(db.Model):
     __tablename__ = 'remedio'
@@ -11,7 +11,7 @@ class Remedio(db.Model):
     frequencia_horas = db.Column(db.Integer, nullable=False)
     horario_inicio = db.Column(db.String(5), nullable=False)
     observacoes = db.Column(db.String(255), nullable=True)
-    data_cadastro = db.Column(db.DateTime, default=datetime.now(datetime.timezone.utc))
+    data_cadastro = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
     ativo = db.Column(db.Boolean, default=True)
 
     doses = db.relationship('Dose', back_populates='remedio', cascade='all, delete-orphan')
