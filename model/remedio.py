@@ -2,7 +2,7 @@ from database import db
 from datetime import datetime
 
 class Remedio(db.Model):
-    __tablename__ = 'remedios'
+    __tablename__ = 'remedio'
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     nome = db.Column(db.String(100), nullable=False)
