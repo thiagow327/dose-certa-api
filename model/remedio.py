@@ -1,26 +1,27 @@
-from database import db
 from datetime import datetime, timezone
+from sqlalchemy import Column, Integer, String, Boolean, DateTime
+from sqlalchemy.orm import relationship
+from database.db import Base
 
-class Remedio(db.Model):
-    __tablename__ = 'remedio'
+class Remedio(Base):
+    __tablename__ = "remedio"
 
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    nome = db.Column(db.String(100), nullable=False)
-    dosagem = db.Column(db.String(50), nullable=False)
-    unidade = db.Column(db.String(20), nullable=False)
-    frequencia_horas = db.Column(db.Integer, nullable=False)
-    horario_inicio = db.Column(db.String(5), nullable=False)
-    observacoes = db.Column(db.String(255), nullable=True)
-    data_cadastro = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
-    ativo = db.Column(db.Boolean, default=True)
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    nome = Column(String(100), nullable=False)
+    dosagem = Column(String(50), nullable=False)
+    unidade = Column(String(30), nullable=False)
+    frequencia_horas = Column(Integer, nullable=False)
+    horario_inicio = Column(String(5), nullable=False)
+    observacoes = Column(String(200), nullable=True)
+    data_cadastro = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+    ativo = Column(Boolean, default=True)
 
-    doses = db.relationship('Dose', back_populates='remedio', cascade='all, delete-orphan')
-    
+    doses = relationship("Dose", back_populates="remedio", cascade="all, delete-orphan")
+
     def __init__(self, nome, dosagem, unidade, frequencia_horas, horario_inicio, observacoes=None):
         self.nome = nome
         self.dosagem = dosagem
         self.unidade = unidade
         self.frequencia_horas = frequencia_horas
         self.horario_inicio = horario_inicio
-        self.observacoes = observacoes  
-        
+        self.observacoes = observacoes
