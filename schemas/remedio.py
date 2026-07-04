@@ -1,15 +1,31 @@
-from pydantic import BaseModel
+from datetime import time
 from typing import Optional, List
+from pydantic import BaseModel, Field, field_validator
 
 
 class RemedioSchema(BaseModel):
     """Dados necessários para cadastrar um remédio."""
-    nome: str
-    dosagem: str
-    unidade: str
-    frequencia_horas: int
+    nome: str = Field(..., min_length=1, max_length=100)
+    dosagem: float = Field(..., gt=0)
+    unidade: str = Field(..., min_length=1, max_length=30)
+    frequencia_horas: int = Field(..., gt=0)
     horario_inicio: str
     observacoes: Optional[str] = None
+
+    @field_validator("nome")
+    @classmethod
+    def validar_nome(cls, value: str) -> str:
+        return value.strip()
+
+    @field_validator("horario_inicio")
+    @classmethod
+    def validar_horario_inicio(cls, value: str) -> str:
+        try:
+            hora, minuto = value.split(":")
+            time(hour=int(hora), minute=int(minuto))
+        except Exception as exc:
+            raise ValueError("horario_inicio deve estar no formato HH:MM") from exc
+        return value
 
 
 class RemedioBuscaSchema(BaseModel):
@@ -27,7 +43,7 @@ class RemedioViewSchema(BaseModel):
     """Como um remédio é retornado pela API."""
     id: int
     nome: str
-    dosagem: str
+    dosagem: float
     unidade: str
     frequencia_horas: int
     horario_inicio: str
