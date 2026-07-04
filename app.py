@@ -24,15 +24,15 @@ def home():
 
 @app.post("/remedio", tags=[remedio_tag],
           responses={"200": RemedioViewSchema, "409": ErrorSchema, "400": ErrorSchema})
-def add_remedio(form: RemedioSchema):
+def add_remedio(body: RemedioSchema):
     """Cadastra um novo remédio na base de dados."""
     remedio = Remedio(
-        nome=form.nome,
-        dosagem=form.dosagem,
-        unidade=form.unidade,
-        frequencia_horas=form.frequencia_horas,
-        horario_inicio=form.horario_inicio,
-        observacoes=form.observacoes
+        nome=body.nome,
+        dosagem=body.dosagem,
+        unidade=body.unidade,
+        frequencia_horas=body.frequencia_horas,
+        horario_inicio=body.horario_inicio,
+        observacoes=body.observacoes
     )
     logger.debug(f"Adicionando remédio: '{remedio.nome}'")
     try:
@@ -105,11 +105,11 @@ def del_remedio(query: RemedioBuscaSchema):
 
 @app.post("/dose", tags=[dose_tag],
           responses={"200": DoseViewSchema, "404": ErrorSchema, "400": ErrorSchema})
-def add_dose(form: DoseSchema):
+def add_dose(body: DoseSchema):
     """Registra uma dose tomada."""
-    logger.debug(f"Registrando dose para remédio id: {form.remedio_id}")
+    logger.debug(f"Registrando dose para remédio id: {body.remedio_id}")
     session = Session()
-    remedio = session.query(Remedio).filter(Remedio.id == form.remedio_id).first()
+    remedio = session.query(Remedio).filter(Remedio.id == body.remedio_id).first()
 
     if not remedio:
         error_msg = "Remédio não encontrado."
@@ -117,10 +117,10 @@ def add_dose(form: DoseSchema):
         return {"message": error_msg}, 404
 
     try:
-        dose = Dose(remedio_id=form.remedio_id, observacoes=form.observacoes)
+        dose = Dose(remedio_id=body.remedio_id, observacoes=body.observacoes)
         session.add(dose)
         session.commit()
-        logger.debug(f"Dose registrada para remédio id: {form.remedio_id}")
+        logger.debug(f"Dose registrada para remédio id: {body.remedio_id}")
         return apresenta_dose(dose), 200
 
     except Exception:
