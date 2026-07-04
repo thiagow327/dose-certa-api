@@ -1,5 +1,5 @@
 from datetime import datetime, timezone
-from sqlalchemy import Column, Integer, String, Boolean, DateTime
+from sqlalchemy import Column, Integer, String, Boolean, DateTime, Float
 from sqlalchemy.orm import relationship
 from database.db import Base
 
@@ -7,8 +7,8 @@ class Remedio(Base):
     __tablename__ = "remedio"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    nome = Column(String(100), nullable=False)
-    dosagem = Column(String(50), nullable=False)
+    nome = Column(String(100), nullable=False, unique=True)
+    dosagem = Column(Float, nullable=False)
     unidade = Column(String(30), nullable=False)
     frequencia_horas = Column(Integer, nullable=False)
     horario_inicio = Column(String(5), nullable=False)
@@ -20,7 +20,7 @@ class Remedio(Base):
 
     def __init__(self, nome, dosagem, unidade, frequencia_horas, horario_inicio, observacoes=None):
         self.nome = nome
-        self.dosagem = dosagem
+        self.dosagem = float(dosagem)
         self.unidade = unidade
         self.frequencia_horas = frequencia_horas
         self.horario_inicio = horario_inicio
