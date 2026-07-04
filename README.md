@@ -55,3 +55,9 @@ Com a API rodando, acesse a documentação Swagger em:
 ```bash
 http://localhost:5000/openapi/swagger
 ```
+
+---
+
+## Diagrama ER
+
+<img src="docs/diagrama_er.png" alt="Diagrama ER">
