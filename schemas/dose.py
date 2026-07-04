@@ -1,6 +1,8 @@
 from pydantic import BaseModel
 from typing import Optional, List
+from datetime import timezone, timedelta
 
+FUSO_BR = timezone(timedelta(hours=-3))
 
 class DoseSchema(BaseModel):
     """Dados necessários para registrar uma dose tomada."""
@@ -23,10 +25,14 @@ class ListagemDosesSchema(BaseModel):
 
 def apresenta_dose(dose):
     """Retorna uma dose no formato definido por DoseViewSchema."""
+    dt = dose.data_hora
+    if dt.tzinfo is None:
+        dt = dt.replace(tzinfo=timezone.utc)
+    dt = dt.astimezone(FUSO_BR)
     return {
         "id": dose.id,
         "remedio_id": dose.remedio_id,
-        "data_hora": dose.data_hora.strftime("%d/%m/%Y %H:%M"),
+        "data_hora": dt.strftime("%d/%m/%Y %H:%M"),
         "observacoes": dose.observacoes
     }
 
