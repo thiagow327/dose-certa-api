@@ -103,6 +103,42 @@ def del_remedio(query: RemedioBuscaSchema):
     return {"message": "Remédio removido", "id": query.id}, 200
 
 
+@app.put("/remedio", tags=[remedio_tag],
+         responses={"200": RemedioViewSchema, "404": ErrorSchema, "409": ErrorSchema, "400": ErrorSchema})
+def update_remedio(query: RemedioBuscaSchema, body: RemedioSchema):
+    """Edita os dados de um remédio existente."""
+    logger.debug(f"Editando remédio id: {query.id}")
+    session = Session()
+    remedio = session.query(Remedio).filter(Remedio.id == query.id).first()
+
+    if not remedio:
+        error_msg = "Remédio não encontrado."
+        logger.warning(f"Erro ao editar remédio id '{query.id}': {error_msg}")
+        return {"message": error_msg}, 404
+
+    remedio.nome = body.nome
+    remedio.dosagem = body.dosagem
+    remedio.unidade = body.unidade
+    remedio.frequencia_horas = body.frequencia_horas
+    remedio.horario_inicio = body.horario_inicio
+    remedio.observacoes = body.observacoes
+
+    try:
+        session.commit()
+        logger.debug(f"Remédio id '{query.id}' editado")
+        return apresenta_remedio(remedio), 200
+
+    except IntegrityError:
+        error_msg = "Remédio com esse nome já cadastrado."
+        logger.warning(f"Erro ao editar remédio id '{query.id}': {error_msg}")
+        return {"message": error_msg}, 409
+
+    except Exception:
+        error_msg = "Não foi possível editar o remédio."
+        logger.warning(f"Erro ao editar remédio id '{query.id}': {error_msg}")
+        return {"message": error_msg}, 400
+
+
 @app.post("/dose", tags=[dose_tag],
           responses={"200": DoseViewSchema, "404": ErrorSchema, "400": ErrorSchema})
 def add_dose(body: DoseSchema):
